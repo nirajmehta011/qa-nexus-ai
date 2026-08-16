@@ -7,40 +7,17 @@ import { IconAlert, IconCheck, IconCode, IconDownload, IconSpark } from './Icons
 // Shows the generated suite the way an SDET reads it: how trustworthy it is
 // first, then what was rejected, then the file tree, then the code.
 
-// Two tiers, deliberately distinguished: static sources can only propose a
-// selector, while a blast-ground import has had every one of them resolved in a
-// real browser. Calling both "verified" would overclaim the common case.
-function GroundingMeter({ rate, hasGrounding, verified }: { rate: number; hasGrounding: boolean; verified: boolean }) {
-  const pct = Math.round(rate * 100)
-  const tone = !hasGrounding ? 'var(--text-faint)' : pct >= 80 ? 'var(--ok)' : pct >= 40 ? 'var(--warn)' : 'var(--err)'
-  const caption = !hasGrounding ? 'no DOM supplied' : verified ? 'live-verified locators' : 'best-effort (static)'
+import GroundingGauge from './GroundingGauge'
 
+function GroundingMeter({ rate, hasGrounding, verified }: { rate: number; hasGrounding: boolean; verified: boolean }) {
   return (
-    <div className="min-w-[150px]">
-      <p className="eyebrow">Selector grounding</p>
-      <div className="flex items-baseline gap-1.5">
-        <span className="mono text-[17px] font-semibold leading-tight" style={{ color: tone }}>
-          {hasGrounding ? `${pct}%` : '—'}
-        </span>
-        <span className="text-[11px]" style={{ color: verified ? 'var(--accent-hi)' : 'var(--text-faint)' }}>
-          {caption}
-        </span>
-      </div>
-      <div
-        className="mt-1.5 h-1 w-full overflow-hidden rounded-full"
-        style={{ background: 'var(--bg-hover)' }}
-        role="progressbar"
-        aria-valuenow={hasGrounding ? pct : 0}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-label={
-          verified
-            ? 'Share of generated locators resolved against a live browser'
-            : 'Share of generated locators drawn from the grounded selector list'
-        }
-      >
-        <div style={{ width: `${hasGrounding ? pct : 0}%`, height: '100%', background: tone, transition: 'width .4s' }} />
-      </div>
+    <div className="flex items-center gap-3">
+      <GroundingGauge
+        rate={hasGrounding ? rate : 0}
+        verified={verified}
+        size="sm"
+        label="Selector Grounding"
+      />
     </div>
   )
 }

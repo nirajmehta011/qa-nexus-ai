@@ -5,118 +5,109 @@
 @tailwind utilities;
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   QA Nexus AI design system — built directly on the Catppuccin palette.
+   QA Nexus AI Design System — Claude Code Theme (Terracotta & Oatmeal)
 
-   Two themes share one token set, so every component is written once:
-   · Mocha (dark)  — the official Catppuccin dark palette.
-   · Latte (light) — the official Catppuccin light palette.
+   Dual-theme system supporting:
+   · Light Mode: Warm Oatmeal Parchment (#fbfaf8) with Linen Cards & Terracotta
+   · Dark Mode: Warm Espresso Obsidian (#181816) with Charcoal Surfaces & Terracotta
 
-   Accent is Catppuccin Peach (never blue/purple); "grounded / verified /
-   from your own framework" is Catppuccin Green; status colours map to
-   Green/Yellow/Red and stay reserved for pass/warn/fail semantics so they
-   never read as decoration.
-
-   Catppuccin's dark-theme accents are intentionally light pastels (meant to
-   sit as foreground text on a dark base), so a solid accent-filled button
-   needs DARK ink in Mocha and WHITE ink in Latte — that's what --accent-ink
-   is for. Every other accent usage in this file is a translucent tint
-   (chip/badge backgrounds), which never has this problem.
+   Accents:
+   · Accent: Claude Terracotta / Rust-Orange (#da7756 / #c2410c)
+   · Grounded / Verified Locators: Forest Mint (#3b7a38 / #6ba368)
+   · Status Colors: Mint (OK), Warm Amber (Warn), Coral Red (Error)
    ───────────────────────────────────────────────────────────────────────────── */
 
 :root {
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-  --radius: 10px;
-  --radius-sm: 6px;
+  --radius: 12px;
+  --radius-sm: 7px;
 
-  /* ── Catppuccin Latte (light) — the default when no theme has been chosen ── */
-  --bg-base: #e6e9ef; /* Mantle */
-  --bg-surface: #eff1f5; /* Base */
+  /* ── Claude Light Mode (Oatmeal & Linen) ── */
+  --bg-base: #fbfaf8;
+  --bg-surface: #f4f1ea;
   --bg-raised: #ffffff;
-  --bg-input: #dce0e8; /* Crust */
-  --bg-hover: rgba(76, 79, 105, 0.06);
+  --bg-input: #ece8df;
+  --bg-hover: rgba(37, 36, 34, 0.05);
 
-  --border: rgba(76, 79, 105, 0.14);
-  --border-strong: rgba(76, 79, 105, 0.26);
+  --border: rgba(37, 36, 34, 0.12);
+  --border-strong: rgba(37, 36, 34, 0.22);
 
-  --text: #4c4f69; /* Text */
-  --text-dim: #5c5f77; /* Subtext1 */
-  --text-faint: #6c6f85; /* Subtext0 */
+  --text: #252422;
+  --text-dim: #68645e;
+  --text-faint: #948f86;
 
-  --accent: #fe640b; /* Peach */
-  --accent-hi: #fe640b;
-  --accent-dim: rgba(254, 100, 11, 0.12);
-  --accent-line: rgba(254, 100, 11, 0.35);
-  /* Raw Peach is ~3:1 against white — too low for button text. Darkened for
-     any solid fill that carries text; --accent stays true-Peach for tints. */
-  --accent-solid: color-mix(in srgb, #fe640b 78%, black);
+  --accent: #da7756;
+  --accent-hi: #c2410c;
+  --accent-dim: rgba(218, 119, 86, 0.12);
+  --accent-line: rgba(218, 119, 86, 0.35);
+  --accent-solid: #c2410c;
   --accent-ink: #ffffff;
 
-  --mint: #40a02b; /* Green */
-  --mint-dim: rgba(64, 160, 43, 0.12);
-  --mint-line: rgba(64, 160, 43, 0.35);
+  --mint: #3b7a38;
+  --mint-dim: rgba(59, 122, 56, 0.12);
+  --mint-line: rgba(59, 122, 56, 0.35);
 
-  --ok: #40a02b; /* Green */
-  --warn: #df8e1d; /* Yellow */
-  --warn-dim: rgba(223, 142, 29, 0.12);
-  --warn-line: rgba(223, 142, 29, 0.34);
-  --err: #d20f39; /* Red */
-  --err-dim: rgba(210, 15, 57, 0.1);
-  --err-line: rgba(210, 15, 57, 0.32);
+  --ok: #3b7a38;
+  --warn: #c26d15;
+  --warn-dim: rgba(194, 109, 21, 0.12);
+  --warn-line: rgba(194, 109, 21, 0.34);
+  --err: #c53030;
+  --err-dim: rgba(197, 48, 48, 0.1);
+  --err-line: rgba(197, 48, 48, 0.32);
 
-  --wash-1: rgba(254, 100, 11, 0.07);
-  --wash-2: rgba(64, 160, 43, 0.06);
-  --btn-raised: #ccd0da; /* Surface0 */
-  --code-text: #4c4f69;
-  --shadow-primary: 0 6px 18px -10px rgba(254, 100, 11, 0.55);
-  --scroll-thumb: rgba(76, 79, 105, 0.18);
-  --scroll-thumb-hover: rgba(76, 79, 105, 0.32);
+  --wash-1: rgba(218, 119, 86, 0.08);
+  --wash-2: rgba(59, 122, 56, 0.05);
+  --btn-raised: #e5e0d5;
+  --code-text: #252422;
+  --shadow-primary: 0 6px 18px -8px rgba(194, 65, 12, 0.45);
+  --scroll-thumb: rgba(37, 36, 34, 0.18);
+  --scroll-thumb-hover: rgba(37, 36, 34, 0.32);
   color-scheme: light;
 }
 
-/* ── Catppuccin Mocha (dark) ──────────────────────────────────────────────── */
+/* ── Claude Dark Mode (Espresso Obsidian & Warm Oatmeal) ── */
 :root[data-theme='dark'] {
-  --bg-base: #181825; /* Mantle */
-  --bg-surface: #1e1e2e; /* Base */
-  --bg-raised: #313244; /* Surface0 — lighter than Base, correct dark-mode elevation */
-  --bg-input: #11111b; /* Crust */
-  --bg-hover: rgba(205, 214, 244, 0.05);
+  --bg-base: #181816;
+  --bg-surface: #22211e;
+  --bg-raised: #2c2b27;
+  --bg-input: #141412;
+  --bg-hover: rgba(242, 239, 233, 0.05);
 
-  --border: rgba(205, 214, 244, 0.08);
-  --border-strong: rgba(205, 214, 244, 0.16);
+  --border: rgba(242, 239, 233, 0.09);
+  --border-strong: rgba(242, 239, 233, 0.18);
 
-  --text: #cdd6f4; /* Text */
-  --text-dim: #bac2de; /* Subtext1 */
-  --text-faint: #a6adc8; /* Subtext0 */
+  --text: #f2efe9;
+  --text-dim: #a8a49c;
+  --text-faint: #7c7870;
 
-  --accent: #fab387; /* Peach */
-  --accent-hi: #fab387;
-  --accent-dim: rgba(250, 179, 135, 0.14);
-  --accent-line: rgba(250, 179, 135, 0.32);
-  /* Mocha's Peach is already a light pastel — usable as a solid fill as-is. */
-  --accent-solid: #fab387;
-  --accent-ink: #1e1e2e; /* Base — dark ink reads correctly on the pastel fill */
+  --accent: #da7756;
+  --accent-hi: #e06c4b;
+  --accent-dim: rgba(218, 119, 86, 0.15);
+  --accent-line: rgba(218, 119, 86, 0.32);
+  --accent-solid: #da7756;
+  --accent-ink: #181816;
 
-  --mint: #a6e3a1; /* Green */
-  --mint-dim: rgba(166, 227, 161, 0.12);
-  --mint-line: rgba(166, 227, 161, 0.3);
+  --mint: #6ba368;
+  --mint-dim: rgba(107, 163, 104, 0.14);
+  --mint-line: rgba(107, 163, 104, 0.3);
 
-  --ok: #a6e3a1;
-  --warn: #f9e2af; /* Yellow */
-  --warn-dim: rgba(249, 226, 175, 0.12);
-  --warn-line: rgba(249, 226, 175, 0.3);
-  --err: #f38ba8; /* Red */
-  --err-dim: rgba(243, 139, 168, 0.12);
-  --err-line: rgba(243, 139, 168, 0.3);
+  --ok: #6ba368;
+  --warn: #e59344;
+  --warn-dim: rgba(229, 147, 68, 0.12);
+  --warn-line: rgba(229, 147, 68, 0.3);
+  --err: #e05d5d;
+  --err-dim: rgba(224, 93, 93, 0.12);
+  --err-line: rgba(224, 93, 93, 0.3);
 
-  --wash-1: rgba(250, 179, 135, 0.1);
-  --wash-2: rgba(166, 227, 161, 0.06);
-  --btn-raised: #45475a; /* Surface1 */
-  --code-text: #cdd6f4;
-  --shadow-primary: 0 6px 18px -8px rgba(250, 179, 135, 0.35);
-  --scroll-thumb: rgba(205, 214, 244, 0.1);
-  --scroll-thumb-hover: rgba(205, 214, 244, 0.2);
+  --wash-1: rgba(218, 119, 86, 0.09);
+  --wash-2: rgba(107, 163, 104, 0.05);
+  --btn-raised: #383631;
+  --code-text: #f2efe9;
+  --shadow-primary: 0 6px 18px -8px rgba(218, 119, 86, 0.4);
+  --scroll-thumb: rgba(242, 239, 233, 0.12);
+  --scroll-thumb-hover: rgba(242, 239, 233, 0.22);
   color-scheme: dark;
 }
 
@@ -138,17 +129,18 @@ body {
   font-size: 14px;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Ambient wash so the flat ground has depth without a busy background. */
+/* Ambient gradient background wash */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(900px 500px at 12% -8%, var(--wash-1), transparent 65%),
-    radial-gradient(700px 420px at 96% 4%, var(--wash-2), transparent 60%);
+    radial-gradient(1000px 550px at 10% -5%, var(--wash-1), transparent 65%),
+    radial-gradient(800px 480px at 95% 5%, var(--wash-2), transparent 60%);
   z-index: 0;
 }
 
@@ -159,12 +151,13 @@ body::before {
 
 ::selection {
   background: var(--accent-dim);
+  color: var(--text);
 }
 
-/* ─── Scrollbars ─────────────────────────────────────────────────────────── */
+/* ─── Custom Scrollbars ─────────────────────────────────────────────────── */
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 9px;
+  height: 9px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
@@ -186,19 +179,21 @@ body::before {
     background: var(--bg-surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   }
 
   .panel-raised {
     background: var(--bg-raised);
     border: 1px solid var(--border);
     border-radius: var(--radius);
+    box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.05);
   }
 
-  /* Micro-label above every control group — the console's structural rhythm. */
+  /* Micro-label above every control group */
   .eyebrow {
     font-size: 10.5px;
     font-weight: 600;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.09em;
     text-transform: uppercase;
     color: var(--text-faint);
   }
@@ -207,15 +202,16 @@ body::before {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 20px;
-    height: 20px;
-    border-radius: 5px;
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
     font-family: var(--font-mono);
     font-size: 11px;
     font-weight: 600;
     background: var(--accent-dim);
     color: var(--accent-hi);
     border: 1px solid var(--accent-line);
+    transition: all 0.2s ease;
   }
 
   /* ─── Controls ─────────────────────────────────────────────────────────── */
@@ -228,7 +224,7 @@ body::before {
     color: var(--text);
     font-family: var(--font-sans);
     font-size: 13px;
-    transition: border-color 0.15s, box-shadow 0.15s;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
   }
   .field::placeholder {
     color: var(--text-faint);
@@ -273,7 +269,7 @@ body::before {
     font-weight: 500;
     cursor: pointer;
     white-space: nowrap;
-    transition: background 0.15s, border-color 0.15s, transform 0.1s, opacity 0.15s;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease, opacity 0.15s ease;
   }
   .btn:hover:not(:disabled) {
     background: var(--btn-raised);
@@ -298,19 +294,13 @@ body::before {
     font-weight: 600;
     box-shadow: var(--shadow-primary);
   }
-  /* `.btn:hover` (above) sets `background` too, and at equal specificity the
-     LAST rule wins per-property — without re-declaring it here explicitly,
-     hover silently falls back to `--btn-raised`, which in Latte is near-white
-     and renders white button text invisible. Re-declaring closes that gap
-     regardless of future reordering. */
   .btn-primary:hover:not(:disabled) {
     background: var(--accent-solid);
-    filter: brightness(1.1);
+    filter: brightness(1.08);
     border-color: transparent;
+    box-shadow: 0 8px 22px -6px rgba(218, 119, 86, 0.55);
   }
   .btn-primary:disabled {
-    /* The base `.btn:disabled` opacity rule is enough contrast-wise here
-       since ink/fill are already a matched, accessible pair. */
     color: var(--accent-ink);
   }
 
@@ -328,9 +318,10 @@ body::before {
   .btn-sm {
     padding: 5px 10px;
     font-size: 12px;
+    border-radius: 5px;
   }
 
-  /* ─── Chips & badges ───────────────────────────────────────────────────── */
+  /* ─── Chips & Badges ───────────────────────────────────────────────────── */
   .chip {
     display: inline-flex;
     align-items: center;
@@ -338,11 +329,12 @@ body::before {
     border-radius: 999px;
     border: 1px solid var(--border);
     background: var(--bg-hover);
-    padding: 2px 9px;
+    padding: 2px 10px;
     font-size: 11px;
     font-weight: 500;
     color: var(--text-dim);
     white-space: nowrap;
+    transition: background 0.15s ease, border-color 0.15s ease;
   }
   .chip-mint {
     background: var(--mint-dim);
@@ -386,20 +378,21 @@ body::before {
   /* ─── Tabs ─────────────────────────────────────────────────────────────── */
   .tab {
     position: relative;
-    padding: 7px 2px;
+    padding: 8px 4px;
     font-size: 13px;
     font-weight: 500;
     color: var(--text-faint);
     background: none;
     border: none;
     cursor: pointer;
-    transition: color 0.15s;
+    transition: color 0.15s ease;
   }
   .tab:hover {
     color: var(--text-dim);
   }
   .tab-active {
     color: var(--text);
+    font-weight: 600;
   }
   .tab-active::after {
     content: '';
@@ -407,14 +400,14 @@ body::before {
     left: 0;
     right: 0;
     bottom: -1px;
-    height: 2px;
+    height: 2.5px;
     border-radius: 2px;
     background: var(--accent-hi);
   }
 
   .segmented {
     display: flex;
-    gap: 2px;
+    gap: 3px;
     padding: 3px;
     background: var(--bg-input);
     border: 1px solid var(--border);
@@ -430,14 +423,16 @@ body::before {
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    transition: background 0.15s, color 0.15s;
+    transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
   }
   .segmented button:hover {
     color: var(--text-dim);
   }
   .segmented button[aria-pressed='true'] {
-    background: var(--accent-dim);
-    color: var(--accent-hi);
+    background: var(--bg-raised);
+    color: var(--text);
+    font-weight: 600;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   }
 
   .dropzone {
@@ -447,7 +442,7 @@ body::before {
     padding: 18px 14px;
     text-align: center;
     cursor: pointer;
-    transition: border-color 0.15s, background 0.15s;
+    transition: border-color 0.15s ease, background 0.15s ease;
   }
   .dropzone:hover,
   .dropzone-active {
@@ -473,12 +468,12 @@ body::before {
 }
 
 @keyframes pulse-dot {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.35; }
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.9); }
 }
 
 .live-dot {
-  animation: pulse-dot 1.6s ease-in-out infinite;
+  animation: pulse-dot 1.8s ease-in-out infinite;
 }
 
 @keyframes rise {

@@ -72,8 +72,8 @@ export default function Header({
           <button
             className="btn btn-ghost btn-sm"
             onClick={onToggleTheme}
-            aria-label={theme === 'midnight' ? 'Switch to Latte light theme' : 'Switch to Midnight dark theme'}
-            title={theme === 'midnight' ? 'Latte (light)' : 'Midnight (dark)'}
+            aria-label={theme === 'midnight' ? 'Switch to Claude Light theme' : 'Switch to Claude Dark theme'}
+            title={theme === 'midnight' ? 'Claude Light (Oatmeal)' : 'Claude Dark (Espresso)'}
           >
             {theme === 'midnight' ? <IconSun /> : <IconMoon />}
           </button>

@@ -4,6 +4,7 @@ import { SCENARIO_TYPES, type ScenarioType } from '../services/schemas'
 import { parseCSVToTestCases, parseExcelToCSV } from '../services/exportService'
 import { extractErrorMessage } from '../services/errorUtils'
 import ExportButtons from './ExportButtons'
+import GroundingGauge from './GroundingGauge'
 import { IconAlert, IconChevron, IconCheck, IconClose, IconCode, IconPlus, IconSpark, IconTrash } from './Icons'
 
 const SCENARIO_LABEL: Record<ScenarioType, string> = {
@@ -445,14 +446,12 @@ export default function TestCasesDisplay({
         <Stat label="Steps" value={totalSteps} />
         <Stat label="Scenario types" value={counts.size} />
         {avgConfidence !== null && (
-          <div>
-            <p className="eyebrow">Avg. grounding</p>
-            <p
-              className="mono text-[17px] font-semibold leading-tight"
-              style={{ color: avgConfidence >= 80 ? 'var(--ok)' : avgConfidence >= 50 ? 'var(--warn)' : 'var(--err)' }}
-            >
-              {avgConfidence}%
-            </p>
+          <div className="flex items-center gap-2">
+            <GroundingGauge
+              rate={avgConfidence / 100}
+              size="sm"
+              label="Avg. grounding"
+            />
           </div>
         )}
 
