@@ -1,0 +1,50 @@
+{
+  "name": "qa-nexus-ai",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "server": "node server.mjs",
+    "dev:full": "concurrently \"npm run server\" \"npm run dev\"",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src server --ext .ts,.tsx,.mjs"
+  },
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1",
+    "axios": "^1.6.0",
+    "cors": "^2.8.6",
+    "docx": "^9.7.1",
+    "dotenv": "^16.3.1",
+    "express": "^4.22.2",
+    "express-rate-limit": "^7.4.0",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.8",
+    "jszip": "^3.10.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-markdown": "^9.0.1",
+    "typescript": "^5.2.2",
+    "zod": "^3.23.8",
+    "zustand": "^4.4.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/jszip": "^3.4.0",
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.2.15",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.16",
+    "concurrently": "^8.2.2",
+    "eslint": "^8.57.0",
+    "jsdom": "^29.1.1",
+    "postcss": "^8.4.31",
+    "tailwindcss": "^3.3.6",
+    "vite": "^5.0.8",
+    "vitest": "^2.1.9"
+  }
+}
