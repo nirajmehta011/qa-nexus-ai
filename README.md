@@ -5,8 +5,8 @@
 **🔗 Live demo:** [qa-nexus-ai-five.vercel.app](https://qa-nexus-ai-five.vercel.app/) — no install needed. Add
 your own API key in Settings, or try the one-click **Try the sample** grounding path described below with no
 key needed to see live-verified selector data flow through the app.
-**📖 Reviewer guide:** [docs/reviewer-guide.html](docs/reviewer-guide.html) — a feature-by-feature walkthrough
-built for someone seeing this project for the first time.
+**📖 Reviewer guide:** [docs/reviewer-guide.md](docs/reviewer-guide.md) — a feature-by-feature walkthrough with
+screenshots, built for someone seeing this project for the first time.
 
 QA Nexus AI reads a requirement — a live URL, a PDF/DOCX spec, a Jira issue, pasted text, or a screen recording
 — generates a detailed, exportable test suite from it, and then writes the Playwright automation. Two things
@@ -285,14 +285,19 @@ users supply their own provider keys in the UI.
 
 **Live app:** **[qa-nexus-ai-five.vercel.app](https://qa-nexus-ai-five.vercel.app/)**
 
-**Reviewer guide:** **[docs/reviewer-guide.html](docs/reviewer-guide.html)** walks through every feature —
+**Reviewer guide:** **[docs/reviewer-guide.md](docs/reviewer-guide.md)** walks through every feature —
 framework-aware generation, both grounding tiers, the `blast-ground` CLI, bulk case selection and export — with
-pointers to exactly where in the UI to find each one. Start there if you want a guided tour instead of exploring
-cold.
+screenshots and pointers to exactly where in the UI to find each one. Start there if you want a guided tour
+instead of exploring cold.
 
 **Fastest way to see the core differentiator with no API key:** open the live app → **Step 3, Selector
 grounding → Import verified → Try the sample**. That loads a real, committed `blast-ground` run and flips the
 grounding badge from *best-effort (static)* to *✅ live-verified* — no install, no key, no waiting.
+
+| | |
+|---|---|
+| ![Live-verified grounding](docs/screenshots/live-verified-grounding.png) | ![Bulk selection: export, automate, or delete just the ticked cases](docs/screenshots/bulk-selection.png) |
+| *Import a real `blast-ground` run — the badge flips from best-effort to live-verified* | *Tick cases, then act on just that subset* |
 
 ## Project structure
 
