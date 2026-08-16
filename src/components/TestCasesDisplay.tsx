@@ -4,7 +4,7 @@ import { SCENARIO_TYPES, type ScenarioType } from '../services/schemas'
 import { parseCSVToTestCases, parseExcelToCSV } from '../services/exportService'
 import { extractErrorMessage } from '../services/errorUtils'
 import ExportButtons from './ExportButtons'
-import { IconAlert, IconChevron, IconCheck, IconClose, IconPlus, IconSpark, IconTrash } from './Icons'
+import { IconAlert, IconChevron, IconCheck, IconClose, IconCode, IconPlus, IconSpark, IconTrash } from './Icons'
 
 const SCENARIO_LABEL: Record<ScenarioType, string> = {
   happy_path: 'Happy path',
@@ -131,11 +131,15 @@ function StepsTable({
 function TestCaseRow({
   testCase,
   defaultOpen,
+  selected,
+  onSelect,
   onUpdate,
   onDelete
 }: {
   testCase: TestCase
   defaultOpen: boolean
+  selected: boolean
+  onSelect: (next: boolean) => void
   onUpdate: (next: TestCase) => void
   onDelete: () => void
 }) {
@@ -147,8 +151,18 @@ function TestCaseRow({
   const renumber = (steps: TestStep[]) => steps.map((s, i) => ({ ...s, stepNumber: i + 1 }))
 
   return (
-    <article className="panel overflow-hidden">
+    <article
+      className="panel overflow-hidden"
+      style={selected ? { borderColor: 'var(--accent-line)', background: 'var(--accent-dim)' } : undefined}
+    >
       <div className="flex items-start gap-2 p-3">
+        <input
+          type="checkbox"
+          className="mt-1 shrink-0 cursor-pointer accent-[var(--accent-hi)]"
+          checked={selected}
+          onChange={e => onSelect(e.target.checked)}
+          aria-label={`Select ${testCase.id}`}
+        />
         <button
           className="mt-0.5 shrink-0"
           onClick={() => setOpen(v => !v)}
@@ -327,7 +341,9 @@ export default function TestCasesDisplay({
   allCases,
   specId,
   busy,
+  automating,
   onGenerateMore,
+  onAutomate,
   onChange
 }: {
   /** Cases currently visible (may be filtered by the coverage matrix). */
@@ -336,12 +352,16 @@ export default function TestCasesDisplay({
   allCases: TestCase[]
   specId: string
   busy: boolean
+  automating: boolean
   onGenerateMore: () => void
+  /** Generate a Playwright suite from exactly these cases. */
+  onAutomate: (cases: TestCase[]) => void
   onChange: (next: TestCase[]) => void
 }) {
   const [filter, setFilter] = useState<ScenarioType | 'all'>('all')
   const [importError, setImportError] = useState('')
   const [importNotice, setImportNotice] = useState('')
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const importRef = useRef<HTMLInputElement>(null)
 
   const counts = useMemo(() => {
@@ -357,10 +377,45 @@ export default function TestCasesDisplay({
     ? Math.round(scored.reduce((sum, tc) => sum + (tc.confidence!.score || 0), 0) / scored.length)
     : null
 
+  // Derived from allCases rather than read straight off the Set, so a case that
+  // was deleted or replaced by an import can never linger in a bulk action.
+  const selectedCases = useMemo(() => allCases.filter(tc => selectedIds.has(tc.id)), [allCases, selectedIds])
+  const visibleSelectedCount = visible.filter(tc => selectedIds.has(tc.id)).length
+  const allVisibleSelected = visible.length > 0 && visibleSelectedCount === visible.length
+
+  const setSelected = (id: string, next: boolean) =>
+    setSelectedIds(prev => {
+      const updated = new Set(prev)
+      if (next) updated.add(id)
+      else updated.delete(id)
+      return updated
+    })
+
+  /** Acts on the filtered view only — "select all" inside a filter must not silently pick up hidden cases. */
+  const toggleAllVisible = () =>
+    setSelectedIds(prev => {
+      const updated = new Set(prev)
+      for (const tc of visible) {
+        if (allVisibleSelected) updated.delete(tc.id)
+        else updated.add(tc.id)
+      }
+      return updated
+    })
+
+  const clearSelection = () => setSelectedIds(new Set())
+
   const updateCase = (id: string, next: TestCase) =>
     onChange(allCases.map(tc => (tc.id === id ? next : tc)))
 
-  const deleteCase = (id: string) => onChange(allCases.filter(tc => tc.id !== id))
+  const deleteCase = (id: string) => {
+    setSelected(id, false)
+    onChange(allCases.filter(tc => tc.id !== id))
+  }
+
+  const deleteSelected = () => {
+    onChange(allCases.filter(tc => !selectedIds.has(tc.id)))
+    clearSelection()
+  }
 
   const importFile = async (file: File) => {
     setImportError('')
@@ -444,7 +499,27 @@ export default function TestCasesDisplay({
         </p>
       )}
 
-      <div className="flex flex-wrap gap-1.5">
+      <div className="flex flex-wrap items-center gap-1.5">
+        {visible.length > 0 && (
+          <label
+            className="chip cursor-pointer select-none"
+            title={allVisibleSelected ? 'Clear selection in this view' : 'Select every case in this view'}
+          >
+            <input
+              type="checkbox"
+              className="cursor-pointer accent-[var(--accent-hi)]"
+              checked={allVisibleSelected}
+              // Partially-selected views get the indeterminate dash rather than
+              // an unticked box that hides the fact a selection exists.
+              ref={el => {
+                if (el) el.indeterminate = visibleSelectedCount > 0 && !allVisibleSelected
+              }}
+              onChange={toggleAllVisible}
+              aria-label="Select all cases in this view"
+            />
+            Select all
+          </label>
+        )}
         <FilterChip active={filter === 'all'} onClick={() => setFilter('all')} label={`All (${testCases.length})`} />
         {SCENARIO_TYPES.filter(t => counts.get(t)).map(t => (
           <FilterChip
@@ -456,12 +531,54 @@ export default function TestCasesDisplay({
         ))}
       </div>
 
+      {selectedCases.length > 0 && (
+        <div
+          className="flex flex-wrap items-center gap-2 rounded-lg border p-2.5"
+          style={{ borderColor: 'var(--accent-line)', background: 'var(--accent-dim)' }}
+        >
+          <span className="text-[12px] font-medium" style={{ color: 'var(--accent-hi)' }}>
+            {selectedCases.length} of {allCases.length} selected
+          </span>
+          <button className="btn btn-ghost btn-sm" onClick={clearSelection}>
+            Clear
+          </button>
+
+          <div className="ml-auto flex flex-wrap items-center gap-2">
+            <ExportButtons
+              testCases={selectedCases}
+              specId={specId}
+              scopeNote={`Exports the ${selectedCases.length} selected case${selectedCases.length === 1 ? '' : 's'}`}
+            />
+            <button
+              className="btn btn-primary btn-sm"
+              onClick={() => onAutomate(selectedCases)}
+              disabled={automating}
+              title="Generate a Playwright suite from only these cases"
+            >
+              {automating ? <span className="spinner" /> : <IconCode size={13} />}
+              Automate {selectedCases.length}
+            </button>
+            <button
+              className="btn btn-sm"
+              onClick={deleteSelected}
+              style={{ color: 'var(--err)' }}
+              title="Delete the selected cases"
+            >
+              <IconTrash size={13} />
+              Delete {selectedCases.length}
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="space-y-2">
         {visible.map(tc => (
           <TestCaseRow
             key={tc.id}
             testCase={tc}
             defaultOpen={testCases.length === 1}
+            selected={selectedIds.has(tc.id)}
+            onSelect={next => setSelected(tc.id, next)}
             onUpdate={next => updateCase(tc.id, next)}
             onDelete={() => deleteCase(tc.id)}
           />

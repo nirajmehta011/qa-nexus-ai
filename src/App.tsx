@@ -87,6 +87,8 @@ function Workspace() {
   const [coverage, setCoverage] = useState<CoverageCell[]>([])
   const [pipelineWarnings, setPipelineWarnings] = useState<string[]>([])
   const [suite, setSuite] = useState<AutomationBuildResult | null>(null)
+  /** Case ids the current suite was built from; null means "the whole set". */
+  const [automationScopeIds, setAutomationScopeIds] = useState<string[] | null>(null)
   const [stall, setStall] = useState<StallState | null>(null)
   const [caseFilter, setCaseFilter] = useState<{ requirementId: string; scenarioType: ScenarioType } | null>(null)
 
@@ -227,6 +229,8 @@ function Workspace() {
     setCoverage(reqs.length > 0 ? finalizeCoverage(result.coverage, reqs, scored) : result.coverage)
     setPipelineWarnings(result.warnings)
     setSuite(null)
+    // A scope pointing at the previous generation's case ids means nothing here.
+    setAutomationScopeIds(null)
     setStall(null)
     setPhase('results')
     setTab('cases')
@@ -466,24 +470,38 @@ function Workspace() {
       setSuite(null)
     })
 
-  const generateAutomation = () =>
+  /**
+   * Scope is held as ids, not case objects, so a later edit or deletion can
+   * never regenerate from a stale copy — and an emptied scope falls back to the
+   * full set rather than generating nothing.
+   */
+  const runAutomation = (scopeIds: string[] | null) =>
     runGuarded('automation', async signal => {
-      if (!spec || testCases.length === 0) return
+      const scoped = scopeIds ? testCases.filter(tc => scopeIds.includes(tc.id)) : []
+      const cases = scoped.length > 0 ? scoped : testCases
+      if (!spec || cases.length === 0) return
       logProgress(framework ? 'writing specs against your page objects' : 'scaffolding the Page Object Model')
       const built = await buildAutomationSuite({
         provider,
         apiKey: activeApiKey,
         model: activeModel,
         projectName: sanitizeName(spec.key || 'qa-suite'),
-        testCases,
+        testCases: cases,
         context: grounding,
         framework,
         signal,
         onProgress: detail => logProgress(detail)
       })
+      setAutomationScopeIds(scoped.length > 0 ? scopeIds : null)
       setSuite(built)
       setTab('automation')
     })
+
+  /** From the cases tab — an explicit subset the user ticked. */
+  const automateSelected = (cases: TestCase[]) => runAutomation(cases.map(tc => tc.id))
+  /** Regenerate keeps whatever scope produced the current suite; "use all" drops it. */
+  const regenerateAutomation = () => runAutomation(automationScopeIds)
+  const automateAll = () => runAutomation(null)
 
   const applyCaseEdits = (next: TestCase[]) => {
     setTestCases(next)
@@ -560,10 +578,10 @@ function Workspace() {
           <StepSection
             index={3}
             title="Selector grounding"
-            hint="Show the app's real DOM and every generated locator is one that provably exists. Without it, selectors are inferred from the spec text and marked TODO-SELECTOR."
+            hint="Show the app's real DOM and every generated locator is drawn from it instead of guessed. Import a blast-ground file and each one has also been resolved in a live browser. Without either, selectors are inferred from the spec text and marked TODO-SELECTOR."
             status={
               groundedCount > 0
-                ? `${groundedCount} verified selector${groundedCount === 1 ? '' : 's'}${grounding.baseUrl ? ` · ${grounding.baseUrl}` : ''}`
+                ? `${groundedCount} ${grounding.verified ? 'live-verified' : 'grounded'} selector${groundedCount === 1 ? '' : 's'}${grounding.baseUrl ? ` · ${grounding.baseUrl}` : ''}`
                 : 'Locators will be inferred from the spec text'
             }
             done={groundedCount > 0}
@@ -635,7 +653,12 @@ function Workspace() {
               </p>
             )}
 
-            <ReadinessSummary hasFramework={Boolean(framework)} groundedCount={groundedCount} onJump={setOpenStep} />
+            <ReadinessSummary
+              hasFramework={Boolean(framework)}
+              groundedCount={groundedCount}
+              verified={Boolean(grounding.verified)}
+              onJump={setOpenStep}
+            />
           </section>
         </aside>
 
@@ -740,7 +763,9 @@ function Workspace() {
                   allCases={testCases}
                   specId={specId}
                   busy={busy === 'more'}
+                  automating={busy === 'automation'}
                   onGenerateMore={generateMore}
+                  onAutomate={automateSelected}
                   onChange={applyCaseEdits}
                 />
               )}
@@ -766,7 +791,11 @@ function Workspace() {
                   busy={false}
                   hasFramework={Boolean(framework)}
                   hasGrounding={groundedCount > 0}
-                  onGenerate={generateAutomation}
+                  verified={Boolean(grounding.verified)}
+                  scopeCount={automationScopeIds ? testCases.filter(tc => automationScopeIds.includes(tc.id)).length : null}
+                  totalCount={testCases.length}
+                  onGenerate={regenerateAutomation}
+                  onGenerateAll={automateAll}
                 />
               )}
             </>
@@ -787,10 +816,12 @@ function Workspace() {
 function ReadinessSummary({
   hasFramework,
   groundedCount,
+  verified,
   onJump
 }: {
   hasFramework: boolean
   groundedCount: number
+  verified: boolean
   onJump: (step: number) => void
 }) {
   const rows = [
@@ -803,7 +834,9 @@ function ReadinessSummary({
     {
       ok: groundedCount > 0,
       step: 3,
-      yes: `Locators will come from ${groundedCount} verified selector${groundedCount === 1 ? '' : 's'}.`,
+      yes: verified
+        ? `Locators will come from ${groundedCount} selector${groundedCount === 1 ? '' : 's'} resolved against a live browser.`
+        : `Locators will come from ${groundedCount} grounded selector${groundedCount === 1 ? '' : 's'} — import a blast-ground file to have them live-verified.`,
       no: 'Locators will be inferred from the spec and marked TODO-SELECTOR — ground them to get a runnable suite.'
     }
   ]
@@ -853,7 +886,7 @@ function EmptyState({
     {
       n: 3,
       title: 'Ground the selectors',
-      body: 'Fetch the page, paste its DOM, or paste a codegen recording — every locator is then one that provably exists.'
+      body: 'Fetch the page, paste its DOM, or import a blast-ground file whose every selector was resolved in a live browser.'
     },
     {
       n: 4,

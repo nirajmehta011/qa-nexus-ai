@@ -1,0 +1,708 @@
+{
+  "version": 1,
+  "generatedAt": "2026-07-10T10:37:53.784Z",
+  "baseUrl": "https://sweetshop.vivrichards.co.uk",
+  "pages": [
+    {
+      "name": "Home",
+      "url": "https://sweetshop.vivrichards.co.uk/"
+    },
+    {
+      "name": "Sweets",
+      "url": "https://sweetshop.vivrichards.co.uk/sweets"
+    },
+    {
+      "name": "Basket",
+      "url": "https://sweetshop.vivrichards.co.uk/basket"
+    },
+    {
+      "name": "Login",
+      "url": "https://sweetshop.vivrichards.co.uk/login"
+    }
+  ],
+  "elements": [
+    {
+      "selector": "page.getByRole('link', { name: 'Sweet Shop' })",
+      "tag": "a",
+      "label": "Sweet Shop",
+      "kind": "link",
+      "page": "Home",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByLabel('Toggle navigation')",
+      "tag": "button",
+      "label": "Toggle navigation",
+      "kind": "button",
+      "page": "Home",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByText('Sweets', { exact: true })",
+      "tag": "a",
+      "label": "Sweets",
+      "kind": "link",
+      "page": "Home",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByRole('link', { name: 'About' })",
+      "tag": "a",
+      "label": "About",
+      "kind": "link",
+      "page": "Home",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByRole('link', { name: 'Login' })",
+      "tag": "a",
+      "label": "Login",
+      "kind": "link",
+      "page": "Home",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByRole('link', { name: /Basket/ })",
+      "tag": "a",
+      "label": "0 Basket",
+      "kind": "link",
+      "page": "Home",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByRole('link', { name: 'Browse Sweets' })",
+      "tag": "a",
+      "label": "Browse Sweets",
+      "kind": "link",
+      "page": "Home",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.locator('[data-id=\"2\"]')",
+      "tag": "a",
+      "label": "Add to Basket",
+      "kind": "other",
+      "page": "Home",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.locator('[data-id=\"4\"]')",
+      "tag": "a",
+      "label": "Add to Basket",
+      "kind": "other",
+      "page": "Home",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.locator('[data-id=\"1\"]')",
+      "tag": "a",
+      "label": "Add to Basket",
+      "kind": "other",
+      "page": "Home",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.locator('[data-id=\"3\"]')",
+      "tag": "a",
+      "label": "Add to Basket",
+      "kind": "other",
+      "page": "Home",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByRole('link', { name: 'Sweet Shop' })",
+      "tag": "a",
+      "label": "Sweet Shop",
+      "kind": "link",
+      "page": "Sweets",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByLabel('Toggle navigation')",
+      "tag": "button",
+      "label": "Toggle navigation",
+      "kind": "button",
+      "page": "Sweets",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByRole('link', { name: 'Sweets' })",
+      "tag": "a",
+      "label": "Sweets",
+      "kind": "link",
+      "page": "Sweets",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByRole('link', { name: 'About' })",
+      "tag": "a",
+      "label": "About",
+      "kind": "link",
+      "page": "Sweets",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByRole('link', { name: 'Login' })",
+      "tag": "a",
+      "label": "Login",
+      "kind": "link",
+      "page": "Sweets",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByRole('link', { name: /Basket/ })",
+      "tag": "a",
+      "label": "0 Basket",
+      "kind": "link",
+      "page": "Sweets",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.locator('[data-id=\"1\"]')",
+      "tag": "a",
+      "label": "Add to Basket",
+      "kind": "other",
+      "page": "Sweets",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.locator('[data-id=\"2\"]')",
+      "tag": "a",
+      "label": "Add to Basket",
+      "kind": "other",
+      "page": "Sweets",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.locator('[data-id=\"3\"]')",
+      "tag": "a",
+      "label": "Add to Basket",
+      "kind": "other",
+      "page": "Sweets",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.locator('[data-id=\"4\"]')",
+      "tag": "a",
+      "label": "Add to Basket",
+      "kind": "other",
+      "page": "Sweets",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.locator('[data-id=\"5\"]')",
+      "tag": "a",
+      "label": "Add to Basket",
+      "kind": "other",
+      "page": "Sweets",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.locator('[data-id=\"6\"]')",
+      "tag": "a",
+      "label": "Add to Basket",
+      "kind": "other",
+      "page": "Sweets",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.locator('[data-id=\"7\"]')",
+      "tag": "a",
+      "label": "Add to Basket",
+      "kind": "other",
+      "page": "Sweets",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.locator('[data-id=\"8\"]')",
+      "tag": "a",
+      "label": "Add to Basket",
+      "kind": "other",
+      "page": "Sweets",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.locator('[data-id=\"9\"]')",
+      "tag": "a",
+      "label": "Add to Basket",
+      "kind": "other",
+      "page": "Sweets",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.locator('[data-id=\"10\"]')",
+      "tag": "a",
+      "label": "Add to Basket",
+      "kind": "other",
+      "page": "Sweets",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.locator('[data-id=\"11\"]')",
+      "tag": "a",
+      "label": "Add to Basket",
+      "kind": "other",
+      "page": "Sweets",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.locator('[data-id=\"12\"]')",
+      "tag": "a",
+      "label": "Add to Basket",
+      "kind": "other",
+      "page": "Sweets",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.locator('[data-id=\"13\"]')",
+      "tag": "a",
+      "label": "Add to Basket",
+      "kind": "other",
+      "page": "Sweets",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.locator('[data-id=\"14\"]')",
+      "tag": "a",
+      "label": "Add to Basket",
+      "kind": "other",
+      "page": "Sweets",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.locator('[data-id=\"15\"]')",
+      "tag": "a",
+      "label": "Add to Basket",
+      "kind": "other",
+      "page": "Sweets",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.locator('[data-id=\"16\"]')",
+      "tag": "a",
+      "label": "Add to Basket",
+      "kind": "other",
+      "page": "Sweets",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByRole('link', { name: 'Sweet Shop' })",
+      "tag": "a",
+      "label": "Sweet Shop",
+      "kind": "link",
+      "page": "Basket",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByLabel('Toggle navigation')",
+      "tag": "button",
+      "label": "Toggle navigation",
+      "kind": "button",
+      "page": "Basket",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByRole('link', { name: 'Sweets' })",
+      "tag": "a",
+      "label": "Sweets",
+      "kind": "link",
+      "page": "Basket",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByRole('link', { name: 'About' })",
+      "tag": "a",
+      "label": "About",
+      "kind": "link",
+      "page": "Basket",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByRole('link', { name: 'Login' })",
+      "tag": "a",
+      "label": "Login",
+      "kind": "link",
+      "page": "Basket",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByText('0 Basket', { exact: true })",
+      "tag": "a",
+      "label": "0 Basket",
+      "kind": "link",
+      "page": "Basket",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByLabel('Collect (FREE)')",
+      "tag": "input",
+      "label": "Collect (FREE)",
+      "kind": "radio",
+      "page": "Basket",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByLabel('Standard Shipping (£1.99)')",
+      "tag": "input",
+      "label": "Standard Shipping (£1.99)",
+      "kind": "radio",
+      "page": "Basket",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByPlaceholder('Promo code')",
+      "tag": "input",
+      "label": "Promo code",
+      "kind": "input",
+      "page": "Basket",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByRole('button', { name: 'Redeem' })",
+      "tag": "button",
+      "label": "Redeem",
+      "kind": "button",
+      "page": "Basket",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByRole('link', { name: 'Empty Basket' })",
+      "tag": "a",
+      "label": "Empty Basket",
+      "kind": "link",
+      "page": "Basket",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByLabel('Email')",
+      "tag": "input",
+      "label": "Email",
+      "kind": "input",
+      "page": "Basket",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.locator('#address')",
+      "tag": "input",
+      "label": "Address",
+      "kind": "input",
+      "page": "Basket",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByLabel('Address 2')",
+      "tag": "input",
+      "label": "Address 2",
+      "kind": "input",
+      "page": "Basket",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByLabel('Country')",
+      "tag": "select",
+      "label": "Country",
+      "kind": "select",
+      "page": "Basket",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.locator('#city')",
+      "tag": "select",
+      "label": "Choose... Bristol Cardiff Swansea",
+      "kind": "select",
+      "page": "Basket",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByLabel('Zip')",
+      "tag": "input",
+      "label": "Zip",
+      "kind": "input",
+      "page": "Basket",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByLabel('Name on card')",
+      "tag": "input",
+      "label": "Name on card",
+      "kind": "input",
+      "page": "Basket",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByLabel('Credit card number')",
+      "tag": "input",
+      "label": "Credit card number",
+      "kind": "input",
+      "page": "Basket",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByLabel('CVV')",
+      "tag": "input",
+      "label": "CVV",
+      "kind": "input",
+      "page": "Basket",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.locator('#cc-cvv')",
+      "tag": "input",
+      "label": "cc-cvv",
+      "kind": "input",
+      "page": "Basket",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByRole('button', { name: 'Continue to checkout' })",
+      "tag": "button",
+      "label": "Continue to checkout",
+      "kind": "button",
+      "page": "Basket",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByRole('link', { name: 'Sweet Shop' })",
+      "tag": "a",
+      "label": "Sweet Shop",
+      "kind": "link",
+      "page": "Login",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByLabel('Toggle navigation')",
+      "tag": "button",
+      "label": "Toggle navigation",
+      "kind": "button",
+      "page": "Login",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByRole('link', { name: 'Sweets' })",
+      "tag": "a",
+      "label": "Sweets",
+      "kind": "link",
+      "page": "Login",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByRole('link', { name: 'About' })",
+      "tag": "a",
+      "label": "About",
+      "kind": "link",
+      "page": "Login",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByRole('link', { name: 'Login' })",
+      "tag": "a",
+      "label": "Login",
+      "kind": "link",
+      "page": "Login",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByRole('link', { name: /Basket/ })",
+      "tag": "a",
+      "label": "0 Basket",
+      "kind": "link",
+      "page": "Login",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByLabel('Email address')",
+      "tag": "input",
+      "label": "Email address",
+      "kind": "input",
+      "page": "Login",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.getByLabel('Password')",
+      "tag": "input",
+      "label": "Password",
+      "kind": "input",
+      "page": "Login",
+      "verifiedCount": 1
+    },
+    {
+      "selector": "page.locator('#btn_login')",
+      "tag": "button",
+      "label": "Login",
+      "kind": "button",
+      "page": "Login",
+      "verifiedCount": 1
+    }
+  ],
+  "collections": [
+    {
+      "name": "card",
+      "itemSelector": ".card",
+      "count": 4,
+      "fields": [
+        {
+          "name": "cardImgTop",
+          "selector": ".card-img-top",
+          "kind": "other"
+        },
+        {
+          "name": "cardBody",
+          "selector": ".card-body",
+          "kind": "other"
+        },
+        {
+          "name": "cardTitle",
+          "selector": ".card-title",
+          "kind": "other"
+        },
+        {
+          "name": "cardText",
+          "selector": ".card-text",
+          "kind": "other"
+        },
+        {
+          "name": "cardFooter",
+          "selector": ".card-footer",
+          "kind": "other"
+        },
+        {
+          "name": "addItem",
+          "selector": ".addItem",
+          "kind": "other"
+        }
+      ],
+      "page": "Home",
+      "nondeterministicOrder": true
+    },
+    {
+      "name": "navItem",
+      "itemSelector": ".nav-item",
+      "count": 3,
+      "fields": [
+        {
+          "name": "navLink",
+          "selector": ".nav-link",
+          "kind": "link"
+        }
+      ],
+      "page": "Home",
+      "nondeterministicOrder": false
+    },
+    {
+      "name": "card",
+      "itemSelector": ".card",
+      "count": 16,
+      "fields": [
+        {
+          "name": "cardImgTop",
+          "selector": ".card-img-top",
+          "kind": "other"
+        },
+        {
+          "name": "cardBody",
+          "selector": ".card-body",
+          "kind": "other"
+        },
+        {
+          "name": "cardTitle",
+          "selector": ".card-title",
+          "kind": "other"
+        },
+        {
+          "name": "cardText",
+          "selector": ".card-text",
+          "kind": "other"
+        },
+        {
+          "name": "cardFooter",
+          "selector": ".card-footer",
+          "kind": "other"
+        },
+        {
+          "name": "addItem",
+          "selector": ".addItem",
+          "kind": "other"
+        }
+      ],
+      "page": "Sweets",
+      "nondeterministicOrder": false
+    },
+    {
+      "name": "navItem",
+      "itemSelector": ".nav-item",
+      "count": 4,
+      "fields": [
+        {
+          "name": "navLink",
+          "selector": ".nav-link",
+          "kind": "link"
+        }
+      ],
+      "page": "Sweets",
+      "nondeterministicOrder": false
+    },
+    {
+      "name": "navItem",
+      "itemSelector": ".nav-item",
+      "count": 4,
+      "fields": [
+        {
+          "name": "navLink",
+          "selector": ".nav-link",
+          "kind": "link"
+        }
+      ],
+      "page": "Basket",
+      "nondeterministicOrder": false
+    },
+    {
+      "name": "navItem",
+      "itemSelector": ".nav-item",
+      "count": 4,
+      "fields": [
+        {
+          "name": "navLink",
+          "selector": ".nav-link",
+          "kind": "link"
+        }
+      ],
+      "page": "Login",
+      "nondeterministicOrder": false
+    }
+  ],
+  "routes": {
+    "valid": [
+      "/",
+      "/sweets",
+      "/about",
+      "/login",
+      "/basket"
+    ],
+    "missing": [
+      "/bout"
+    ]
+  },
+  "unresolved": [
+    {
+      "label": "name",
+      "kind": "input",
+      "tried": [
+        "page.locator('#name')",
+        "page.locator('input.form-control')"
+      ],
+      "reason": "every candidate matched multiple elements (ambiguous; refusing to use a positional .nth() locator)"
+    },
+    {
+      "label": "name",
+      "kind": "input",
+      "tried": [
+        "page.locator('#name')",
+        "page.locator('input.form-control')"
+      ],
+      "reason": "every candidate matched multiple elements (ambiguous; refusing to use a positional .nth() locator)"
+    }
+  ],
+  "warnings": [
+    "[Home] \".card\" reorders itself between loads — address items by text (.filter({ hasText })), never by index."
+  ]
+}

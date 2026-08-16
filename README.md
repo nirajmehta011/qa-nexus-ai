@@ -41,9 +41,20 @@ mergeable.
    the generation prompt.
 
 3. **Ground the selectors** *(the other differentiator, and optional)*. Fetch the page through the proxy, paste
-   its `outerHTML`, or paste a `npx playwright codegen` recording. Every element is distilled into a verified
-   Playwright locator, repeating structures (product grids, result lists) are detected separately, and anything
-   that can't be grounded is emitted as a marked `TODO-SELECTOR` rather than a plausible-looking guess.
+   its `outerHTML`, paste a `npx playwright codegen` recording, or **import a live-verified `grounding.json`**
+   from the [`blast-ground` CLI](tools/blast-ground). Every element is distilled into a Playwright locator,
+   repeating structures (product grids, result lists) are detected separately, and anything that can't be
+   grounded is emitted as a marked `TODO-SELECTOR` rather than a plausible-looking guess.
+
+   Grounding has **two honestly-labelled tiers**, because they are not the same guarantee:
+
+   | Tier | Source | What it actually proves |
+   |---|---|---|
+   | **best-effort (static)** | URL fetch · DOM paste · codegen | The selector was *derived from markup that really exists*. Nothing checked that it resolves to exactly one node. |
+   | **✅ live-verified** | `blast-ground` import | A real headless browser was asked `locator.count()` for every candidate and **only those matching exactly one element were kept**. Routes were fetched and confirmed. |
+
+   Adding a best-effort source on top of an import demotes the whole context back to best-effort — the flag has
+   to stay true for *every* selector in the set, or the generator would skip its route check on a false premise.
 
 4. **Generate and export.** Test cases first (reviewable, editable, filterable, with per-case grounding scores),
    then a runnable Playwright suite as a ZIP.
@@ -80,6 +91,77 @@ test('TC-001 — user signs in with valid credentials', async ({ loginPage, page
 
 Same test case. The second one is a pull request; the first one is homework.
 
+### Proof, not vibes — a real run
+
+Most generators stop at "here is some code." The two claims below were produced by actually running the tools
+in this repo against a live public site ([sweetshop.vivrichards.co.uk](https://sweetshop.vivrichards.co.uk)),
+not written by hand.
+
+**1. Grounding against a live browser**
+
+```console
+$ cd tools/blast-ground && npm install && npx playwright install chromium
+$ npm run ground -- https://sweetshop.vivrichards.co.uk/sweets --page Sweets \
+    --also https://sweetshop.vivrichards.co.uk/login=Login --out grounding.json
+
+→ grounding Sweets (https://sweetshop.vivrichards.co.uk/sweets)
+  ✓ 26 verified · 2 collection(s) · 0 unresolved · 0 dead route(s)
+→ grounding Login (https://sweetshop.vivrichards.co.uk/login)
+  ✓ 13 verified · 1 collection(s) · 0 unresolved · 0 dead route(s)
+
+Wrote grounding.json
+```
+
+This is the part a hosted web app structurally cannot do. It reaches `localhost`, VPN-only staging and
+login-gated pages, and it knows things static HTML cannot — that an `<a>` without `href` gets **no ARIA role**,
+or that `.card-title` matches four nodes rather than one. A candidate matching many nodes is **rejected, not
+disambiguated with `.nth(i)`**: positional locators fail *intermittently*, which is worse than failing loudly.
+
+**2. The generated suite is actually run — and the gate catches what static checks cannot**
+
+Generated with `gemini-flash-lite-latest` from the sweetshop URL above, using the live-verified grounding, then
+executed against the real site. 4 of the 8 generated cases were selected for automation; 34 files exported.
+
+```console
+$ npm run verify-suite -- ../../playwright-suite-sweetshop --base-url https://sweetshop.vivrichards.co.uk
+
+→ npm install
+→ npx playwright install chromium
+→ npx tsc --noEmit
+→ npx playwright test
+
+── verify-suite ──────────────────────────────────────────
+✓ install: dependencies installed
+✓ browser-install: chromium ready
+✓ typecheck: tsc --noEmit passed
+✗ run: 2 passed, 1 failed, 2 skipped (fixme/todo)
+
+Failed tests:
+  ✗ TC-002: Verify keyboard navigation and focus management across interactive product elements
+    Error: expect(locator).toBeFocused() failed
+
+❌ verify-suite failed
+```
+
+**That failure is the point, and it is left in this README on purpose.** Every locator in the failing spec is
+real — `.card` and `.addItem` both came from the live-verified grounding. What the model got wrong was
+*behaviour*: it pressed `Shift+Tab` from the fourth product's button and asserted focus would land on the
+third's, when other focusable elements sit between the cards.
+
+That is the exact class of defect nothing upstream can catch. Grounding proves a selector **exists**; the type
+checker proves the code **compiles**; only running it proves the assertion **holds**. The two skipped specs are
+`test.fixme` stubs for steps the grounding run couldn't reach a selector for — left honestly incomplete rather
+than guessed.
+
+So the honest claim is not "the AI writes perfect tests." It is: **you find out which ones are wrong before you
+open the pull request, instead of at 3am.**
+
+> **Reviewers:** the CLI is a local Node tool by design — that is exactly why it can reach targets a hosted app
+> cannot. You do **not** need it to try the feature. Open the deployed app → **3 Selector grounding** →
+> **Import verified** → **Try the sample**, and a committed run of the CLI loads in one click: 64 live-verified
+> selectors, 6 repeating structures, 1 dead route and 2 elements the browser refused to pin down. Watch the
+> badge flip from *best-effort (static)* to *✅ live-verified*.
+
 ---
 
 ## Features
@@ -88,13 +170,16 @@ Same test case. The second one is a pull request; the first one is homework.
 |---|---|
 | **Five spec sources** | Live URL, uploaded document (PDF/DOCX/MD/TXT/HTML), Jira issue key, pasted text, plus screenshots / wireframes / screen recordings for vision-capable models |
 | **Framework-aware generation** | Page objects, fixtures and conventions extracted client-side and injected into the prompt; new methods are spliced into your real files |
-| **Selector grounding** | URL fetch, DOM paste or codegen recording → verified locators, with repeating-structure detection |
+| **Selector grounding** | URL fetch, DOM paste or codegen recording → grounded locators, with repeating-structure detection |
+| **Live-verified grounding** | `blast-ground` CLI drives a real headless browser, keeps only selectors matching exactly one element, and confirms routes — importable into the app as a `grounding.json` |
+| **Suite verification** | `verify-suite` installs, typechecks and *actually runs* the generated suite, reporting real pass/fail from Playwright's JSON reporter |
 | **Two generation modes** | *Fast* — one pass to test cases. *Deep analysis* — requirement extraction → human review → coverage planning → generation → self-critique |
 | **Traceability matrix** | Requirements down, scenario types across; click a cell to filter the cases that cover it. Gaps are explicit |
 | **Testability review** | Each extracted requirement is scored testable / weak / untestable, with the specific defect named and a one-click suggested rewrite |
 | **Detailed test cases** | 8–30 atomic steps per case with action / test data / expected result, across seven scenario types |
 | **Grounding confidence** | A second LLM pass scores every case 0–100 on how traceable it is to the spec, surfaced as a badge |
 | **Full editing** | Edit any case, step, priority or component inline; add or delete steps; delete cases |
+| **Bulk selection** | Tick any subset — then export, automate or delete just those. Select-all respects the active filter, and automating a subset keeps that scope on regenerate |
 | **CSV / Excel import** | Bring an existing suite in — delimiter and column names are auto-detected |
 | **Four export formats** | Jira CSV importer, Zephyr Scale, Xray, TestRail — plus raw JSON |
 | **Runnable Playwright ZIP** | Page objects, specs, `playwright.config.ts`, `tsconfig.json`, `.env.example`, `.gitignore`, auth setup and a GitHub Actions workflow |
@@ -177,8 +262,10 @@ src/
     aiService.ts           Provider-agnostic LLM layer + fast-path generation prompts
     groundedPipeline.ts    Deep mode: extract → analyse → plan → generate → critique, with checkpoints
     frameworkAnalyzer.ts   Client-side framework parsing → FrameworkProfile → prompt context
-    domDistiller.ts        HTML → verified Playwright locators + repeating-structure detection
+    domDistiller.ts        HTML → candidate Playwright locators + repeating-structure detection
     codegenParser.ts       `playwright codegen` output → recorded actions
+    groundingResolver.ts   Candidate → single-match resolution logic (browser-agnostic, so it unit-tests)
+    groundingImport.ts     Zod contract + parser for a blast-ground `grounding.json`
     astLocatorAudit.ts     AST pass catching collection-locator strict-mode violations
     pomBuilder.ts          Deterministic Page Object Model layers (locators, pages, fixtures)
     automationBuilder.ts   LLM output → validated, scaffolded project (framework-aware or greenfield)
@@ -194,6 +281,10 @@ src/
   hooks/useTheme.ts        Latte / Midnight theme with no-flash first paint
 server/                    Express proxy: providers, Jira, URL fetch, security middleware
 api/index.mjs              Vercel serverless entry wrapping the same routers
+public/
+  sample-grounding.json    A real blast-ground run, shipped so the import path is testable with no install
+tools/blast-ground/        Local Node CLI: live-browser selector verification + verify-suite
+                           Own package.json — excluded from the app's build, tests, lint and deploy
 ```
 
 ## Design notes
@@ -215,6 +306,9 @@ A few decisions worth calling out, because they're the difference between a demo
   another provider from the exact point it stopped, rather than restarting.
 - **The human checkpoint is early.** In deep mode you review extracted requirements *before* any test case is
   written, because correcting one misread requirement is cheaper than correcting the twelve cases built on it.
+- **"Verified" means verified.** Static grounding is labelled *best-effort*, never *verified*, because parsing
+  markup cannot prove a selector resolves to exactly one node — only a live browser can. The stronger label is
+  reserved for a `blast-ground` import, and is dropped the moment an unverified selector joins the set.
 
 ## Limitations
 
@@ -225,7 +319,13 @@ A few decisions worth calling out, because they're the difference between a demo
 - Generation quality tracks the model you pick. Larger models produce noticeably better step granularity.
 - Analysis is capped at 400 source files per framework upload.
 - URL grounding reads server-rendered HTML. For client-rendered SPAs the initial response is often an empty
-  shell — the app detects this and tells you to paste the live DOM instead.
+  shell — the app detects this and tells you to paste the live DOM instead, or import a `blast-ground` file.
+- Running a suite from inside the browser is not possible — browser automation needs a real driver and
+  installed browser binaries, which a web page cannot reach. That is why `verify-suite` is a local CLI. The app
+  itself gives you the exact commands, one copy away, via **Copy run commands**.
+- `blast-ground` grounds *the rendered state of the URLs you point it at* — not "every locator in the app".
+  Elements that only appear after an interaction (modals, dropdowns, wizard steps) need a codegen recording or
+  a `--also` per route. See [its README](tools/blast-ground#limits--what-it-can-and-cannot-capture).
 - Attachments are capped at 12MB in total, and need a vision-capable model (Gemini, GPT-4o).
 
 ## License

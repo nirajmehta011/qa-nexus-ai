@@ -7,9 +7,13 @@ import { IconAlert, IconCheck, IconCode, IconDownload, IconSpark } from './Icons
 // Shows the generated suite the way an SDET reads it: how trustworthy it is
 // first, then what was rejected, then the file tree, then the code.
 
-function GroundingMeter({ rate, hasGrounding }: { rate: number; hasGrounding: boolean }) {
+// Two tiers, deliberately distinguished: static sources can only propose a
+// selector, while a blast-ground import has had every one of them resolved in a
+// real browser. Calling both "verified" would overclaim the common case.
+function GroundingMeter({ rate, hasGrounding, verified }: { rate: number; hasGrounding: boolean; verified: boolean }) {
   const pct = Math.round(rate * 100)
   const tone = !hasGrounding ? 'var(--text-faint)' : pct >= 80 ? 'var(--ok)' : pct >= 40 ? 'var(--warn)' : 'var(--err)'
+  const caption = !hasGrounding ? 'no DOM supplied' : verified ? 'live-verified locators' : 'best-effort (static)'
 
   return (
     <div className="min-w-[150px]">
@@ -18,8 +22,8 @@ function GroundingMeter({ rate, hasGrounding }: { rate: number; hasGrounding: bo
         <span className="mono text-[17px] font-semibold leading-tight" style={{ color: tone }}>
           {hasGrounding ? `${pct}%` : '—'}
         </span>
-        <span className="text-[11px]" style={{ color: 'var(--text-faint)' }}>
-          {hasGrounding ? 'verified locators' : 'no DOM supplied'}
+        <span className="text-[11px]" style={{ color: verified ? 'var(--accent-hi)' : 'var(--text-faint)' }}>
+          {caption}
         </span>
       </div>
       <div
@@ -29,7 +33,11 @@ function GroundingMeter({ rate, hasGrounding }: { rate: number; hasGrounding: bo
         aria-valuenow={hasGrounding ? pct : 0}
         aria-valuemin={0}
         aria-valuemax={100}
-        aria-label="Share of generated locators that were verified against a real DOM"
+        aria-label={
+          verified
+            ? 'Share of generated locators resolved against a live browser'
+            : 'Share of generated locators drawn from the grounded selector list'
+        }
       >
         <div style={{ width: `${hasGrounding ? pct : 0}%`, height: '100%', background: tone, transition: 'width .4s' }} />
       </div>
@@ -43,18 +51,29 @@ export default function AutomationPanel({
   busy,
   hasFramework,
   hasGrounding,
-  onGenerate
+  verified,
+  scopeCount,
+  totalCount,
+  onGenerate,
+  onGenerateAll
 }: {
   suite: AutomationBuildResult | null
   specId: string
   busy: boolean
   hasFramework: boolean
   hasGrounding: boolean
+  verified: boolean
+  /** Cases this suite was built from, when it was a subset; null means all of them. */
+  scopeCount: number | null
+  totalCount: number
   onGenerate: () => void
+  onGenerateAll: () => void
 }) {
   const [selected, setSelected] = useState(0)
   const [downloadError, setDownloadError] = useState('')
   const [copiedCommands, setCopiedCommands] = useState(false)
+
+  const isSubset = scopeCount !== null && scopeCount < totalCount
 
   if (!suite) {
     return (
@@ -64,7 +83,7 @@ export default function AutomationPanel({
           <p className="text-[14px] font-medium">No automation suite yet</p>
           <p className="mx-auto mt-1 max-w-md text-[12px]" style={{ color: 'var(--text-faint)' }}>
             {hasFramework && hasGrounding
-              ? 'Your framework and a grounded DOM are both loaded — specs will call your own page classes using verified selectors.'
+              ? `Your framework and a grounded DOM are both loaded — specs will call your own page classes using ${verified ? 'live-verified' : 'grounded'} selectors.`
               : hasFramework
                 ? 'Your framework is loaded. Add selector grounding too and every locator will be one that provably exists.'
                 : hasGrounding
@@ -116,8 +135,24 @@ export default function AutomationPanel({
 
   return (
     <div className="space-y-4">
+      {isSubset && (
+        <div
+          className="flex flex-wrap items-center gap-2 rounded-lg border p-2.5 text-[12px]"
+          style={{ borderColor: 'var(--accent-line)', background: 'var(--accent-dim)' }}
+        >
+          <IconCode size={14} style={{ color: 'var(--accent-hi)' }} />
+          <span>
+            This suite covers <strong>{scopeCount}</strong> of {totalCount} test cases — the ones selected when you
+            generated it. Regenerate keeps that scope.
+          </span>
+          <button className="btn btn-sm ml-auto" onClick={onGenerateAll} disabled={busy}>
+            Use all {totalCount}
+          </button>
+        </div>
+      )}
+
       <div className="panel flex flex-wrap items-center gap-x-6 gap-y-3 p-3">
-        <GroundingMeter rate={suite.selectorGroundingRate} hasGrounding={hasGrounding} />
+        <GroundingMeter rate={suite.selectorGroundingRate} hasGrounding={hasGrounding} verified={verified} />
 
         <div>
           <p className="eyebrow">Files</p>
@@ -145,7 +180,12 @@ export default function AutomationPanel({
         </div>
 
         <div className="ml-auto flex gap-2">
-          <button className="btn btn-sm" onClick={onGenerate} disabled={busy}>
+          <button
+            className="btn btn-sm"
+            onClick={onGenerate}
+            disabled={busy}
+            title={isSubset ? `Regenerate from the same ${scopeCount} cases` : 'Regenerate from all test cases'}
+          >
             {busy ? <span className="spinner" /> : <IconSpark size={13} />}
             Regenerate
           </button>

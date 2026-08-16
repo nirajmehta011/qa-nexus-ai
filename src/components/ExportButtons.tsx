@@ -17,7 +17,16 @@ const TARGETS: { label: string; hint: string; run: (cases: TestCase[], specId: s
   { label: 'JSON', hint: 'Raw generated data', run: (c, id) => exportTestCasesAsJSON(c, id) }
 ]
 
-export default function ExportButtons({ testCases, specId }: { testCases: TestCase[]; specId: string }) {
+export default function ExportButtons({
+  testCases,
+  specId,
+  scopeNote
+}: {
+  testCases: TestCase[]
+  specId: string
+  /** Shown above the targets when the export covers a subset, so "Export" is never ambiguous. */
+  scopeNote?: string
+}) {
   const [open, setOpen] = useState(false)
 
   if (testCases.length === 0) return null
@@ -34,6 +43,11 @@ export default function ExportButtons({ testCases, specId }: { testCases: TestCa
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} aria-hidden="true" />
           <div className="panel-raised rise absolute right-0 z-20 mt-1.5 w-56 overflow-hidden p-1 shadow-xl">
+            {scopeNote && (
+              <p className="border-b px-2.5 pb-1.5 pt-1 text-[11px]" style={{ borderColor: 'var(--border)', color: 'var(--accent-hi)' }}>
+                {scopeNote}
+              </p>
+            )}
             {TARGETS.map(target => (
               <button
                 key={target.label}

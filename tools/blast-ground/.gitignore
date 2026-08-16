@@ -1,0 +1,4 @@
+node_modules/
+# CLI output. A real, committed sample lives in examples/sweetshop.grounding.json
+grounding.json
+package-lock.json

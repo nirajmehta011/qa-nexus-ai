@@ -29,7 +29,15 @@ const testCase = (overrides: Partial<TestCase> = {}): TestCase => ({
  * change — exercising the same round-trip the real app does, rather than
  * asserting against a spy that never feeds the new value back.
  */
-function Harness({ initial, onChange }: { initial: TestCase[]; onChange: (next: TestCase[]) => void }) {
+function Harness({
+  initial,
+  onChange,
+  onAutomate
+}: {
+  initial: TestCase[]
+  onChange: (next: TestCase[]) => void
+  onAutomate: (cases: TestCase[]) => void
+}) {
   const [cases, setCases] = useState(initial)
   return (
     <TestCasesDisplay
@@ -37,7 +45,9 @@ function Harness({ initial, onChange }: { initial: TestCase[]; onChange: (next: 
       allCases={cases}
       specId="spec"
       busy={false}
+      automating={false}
       onGenerateMore={vi.fn()}
+      onAutomate={onAutomate}
       onChange={next => {
         setCases(next)
         onChange(next)
@@ -48,8 +58,9 @@ function Harness({ initial, onChange }: { initial: TestCase[]; onChange: (next: 
 
 function setup(cases: TestCase[] = [testCase()]) {
   const onChange = vi.fn()
-  render(<Harness initial={cases} onChange={onChange} />)
-  return { onChange, user: userEvent.setup() }
+  const onAutomate = vi.fn()
+  render(<Harness initial={cases} onChange={onChange} onAutomate={onAutomate} />)
+  return { onChange, onAutomate, user: userEvent.setup() }
 }
 
 const lastCases = (onChange: ReturnType<typeof vi.fn>): TestCase[] => onChange.mock.calls.at(-1)![0]
@@ -137,5 +148,70 @@ describe('TestCasesDisplay filtering', () => {
     ])
     const stat = screen.getByText('Avg. grounding').parentElement!
     expect(within(stat).getByText('80%')).toBeInTheDocument()
+  })
+})
+
+describe('TestCasesDisplay selection', () => {
+  const three = () => [
+    testCase(),
+    testCase({ id: 'TC-002', summary: 'Rejects a bad password', scenarioType: 'negative' }),
+    testCase({ id: 'TC-003', summary: 'Locks after five attempts', scenarioType: 'security' })
+  ]
+
+  it('shows no bulk bar until something is selected', () => {
+    setup(three())
+    expect(screen.queryByRole('button', { name: /^Automate/ })).not.toBeInTheDocument()
+  })
+
+  it('automates only the selected cases', async () => {
+    const { onAutomate, user } = setup(three())
+
+    await user.click(screen.getByLabelText('Select TC-001'))
+    await user.click(screen.getByLabelText('Select TC-003'))
+    await user.click(screen.getByRole('button', { name: /^Automate 2$/ }))
+
+    expect(onAutomate).toHaveBeenCalledTimes(1)
+    expect(onAutomate.mock.calls[0][0].map((c: TestCase) => c.id)).toEqual(['TC-001', 'TC-003'])
+  })
+
+  it('deletes only the selected cases and clears the bar', async () => {
+    const { onChange, user } = setup(three())
+
+    await user.click(screen.getByLabelText('Select TC-002'))
+    await user.click(screen.getByRole('button', { name: /^Delete 1$/ }))
+
+    expect(lastCases(onChange).map(c => c.id)).toEqual(['TC-001', 'TC-003'])
+    expect(screen.queryByRole('button', { name: /^Delete 1$/ })).not.toBeInTheDocument()
+  })
+
+  it('select-all covers the filtered view only, never hidden cases', async () => {
+    const { onAutomate, user } = setup(three())
+
+    await user.click(screen.getByRole('button', { name: /^Negative \(1\)$/ }))
+    await user.click(screen.getByLabelText('Select all cases in this view'))
+    await user.click(screen.getByRole('button', { name: /^Automate 1$/ }))
+
+    expect(onAutomate.mock.calls[0][0].map((c: TestCase) => c.id)).toEqual(['TC-002'])
+  })
+
+  it('drops a case from the selection when it is deleted individually', async () => {
+    const { user } = setup(three())
+
+    await user.click(screen.getByLabelText('Select TC-001'))
+    await user.click(screen.getByLabelText('Select TC-002'))
+    expect(screen.getByRole('button', { name: /^Automate 2$/ })).toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Delete TC-001' }))
+    expect(screen.getByRole('button', { name: /^Automate 1$/ })).toBeInTheDocument()
+  })
+
+  it('scopes the export dropdown to the selection', async () => {
+    const { user } = setup(three())
+
+    await user.click(screen.getByLabelText('Select TC-001'))
+    const bulkExport = screen.getAllByRole('button', { name: /^Export/ }).at(-1)!
+    await user.click(bulkExport)
+
+    expect(screen.getByText('Exports the 1 selected case')).toBeInTheDocument()
   })
 })
