@@ -122,6 +122,8 @@ disambiguated with `.nth(i)`**: positional locators fail *intermittently*, which
 Generated with `gemini-flash-lite-latest` from the sweetshop URL above, using the live-verified grounding, then
 executed against the real site. 4 of the 8 generated cases were selected for automation; 34 files exported.
 
+**Before — the gate catches a real defect:**
+
 ```console
 $ npm run verify-suite -- ../../playwright-suite-sweetshop --base-url https://sweetshop.vivrichards.co.uk
 
@@ -143,18 +145,37 @@ Failed tests:
 ❌ verify-suite failed
 ```
 
-**That failure is the point, and it is left in this README on purpose.** Every locator in the failing spec is
-real — `.card` and `.addItem` both came from the live-verified grounding. What the model got wrong was
-*behaviour*: it pressed `Shift+Tab` from the fourth product's button and asserted focus would land on the
-third's, when other focusable elements sit between the cards.
+**The locator was correct. The assumption about the page was not.** `.card` and `.addItem` both came straight
+from the live-verified grounding — that part of the model's output was never in question. What failed was line
+9: `await expect(card1Button).toBeFocused()`, immediately after `.focus()`. Tracing it against the live DOM
+showed why — `.addItem` renders as `<a class="btn btn-success btn-block addItem">`, with **no `href` and no
+`tabindex`**. A browser never puts an anchor like that in the tab order, so `.focus()` silently no-ops and
+focus stays on `<body>`. The model wrote a keyboard-navigation test against a control that cannot receive
+keyboard focus at all — a defect in the generated test's assumptions about the page, not in the selector. It is
+the same href-less-anchor ambiguity the [CLI's own README](tools/blast-ground/README.md) already calls out as a
+thing static parsing cannot know and a live browser can.
+
+**After — fixed by hand, re-verified against the live site, stable across repeated runs:**
+
+```console
+✓ install: node_modules already present, skipped
+✓ typecheck: tsc --noEmit passed
+✓ run: 3 passed, 0 failed, 2 skipped (fixme/todo)
+
+✅ verify-suite passed
+```
+
+The fix keeps the keyboard-navigation assertion for what is genuinely keyboard-reachable — the first real `Tab`
+lands on the nav brand link, confirmed live — and exercises `.addItem` the only way an actual user could:
+by click, then asserts the basket count. The two skipped specs are `test.fixme` stubs for steps the grounding
+run couldn't reach a selector for, left honestly incomplete rather than guessed.
 
 That is the exact class of defect nothing upstream can catch. Grounding proves a selector **exists**; the type
-checker proves the code **compiles**; only running it proves the assertion **holds**. The two skipped specs are
-`test.fixme` stubs for steps the grounding run couldn't reach a selector for — left honestly incomplete rather
-than guessed.
+checker proves the code **compiles**; only running it proves the assertion **holds** — and once it doesn't, the
+fix is small precisely because everything else about the suite was already correct.
 
 So the honest claim is not "the AI writes perfect tests." It is: **you find out which ones are wrong before you
-open the pull request, instead of at 3am.**
+open the pull request, instead of at 3am — and closing the gap is minutes, not a rewrite.**
 
 > **Reviewers:** the CLI is a local Node tool by design — that is exactly why it can reach targets a hosted app
 > cannot. You do **not** need it to try the feature. Open the deployed app → **3 Selector grounding** →
