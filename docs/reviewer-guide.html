@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QA Nexus AI — Reviewer Guide</title>
+<style>
+  :root {
+    --bg: #faf6f0; --panel: #ffffff; --border: #e8ddd0; --text: #2b241d; --text-dim: #6b5f52; --text-faint: #9a8d7c;
+    --accent: #da7756; --accent-hi: #c2410c; --accent-dim: rgba(218,119,86,.10); --accent-line: rgba(218,119,86,.35);
+    --mint: #3b7a38; --mint-dim: rgba(59,122,56,.10); --mint-line: rgba(59,122,56,.35);
+    --warn: #b45309; --warn-dim: rgba(180,83,9,.10);
+    --code-bg: #f3ece3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#181410; --panel:#211c17; --border:#3a3025; --text:#f0e9df; --text-dim:#b8aa97; --text-faint:#8a7c68;
+      --accent:#e08a68; --accent-hi:#f0975f; --accent-dim:rgba(224,138,104,.14); --accent-line:rgba(224,138,104,.4);
+      --mint:#7fbf6e; --mint-dim:rgba(127,191,110,.14); --mint-line:rgba(127,191,110,.4);
+      --warn:#e0a83a; --warn-dim:rgba(224,168,58,.14); --code-bg:#150e08; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; line-height:1.55; }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 48px 24px 96px; }
+  h1 { font-size: 28px; margin: 0 0 6px; letter-spacing: -.01em; }
+  .sub { color: var(--text-dim); font-size: 15px; margin: 0 0 8px; }
+  .meta { display:flex; flex-wrap:wrap; gap:8px; margin: 18px 0 40px; }
+  .chip { font-size:12px; font-weight:600; padding:4px 10px; border-radius:999px; border:1px solid var(--border); color:var(--text-dim); }
+  .chip.accent { background:var(--accent-dim); border-color:var(--accent-line); color:var(--accent-hi); }
+  .chip.mint { background:var(--mint-dim); border-color:var(--mint-line); color:var(--mint); }
+  h2 { font-size: 20px; margin: 48px 0 4px; display:flex; align-items:center; gap:10px; }
+  h2 .n { display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:50%; background:var(--accent); color:#fff; font-size:13px; font-weight:700; flex-shrink:0; }
+  .lede { color: var(--text-dim); font-size: 14px; margin: 4px 0 18px 36px; }
+  .card { background: var(--panel); border:1px solid var(--border); border-radius:12px; padding:18px 20px; margin: 12px 0 12px 36px; }
+  .card h3 { font-size:14px; margin:0 0 6px; }
+  .card p { font-size:13.5px; color:var(--text-dim); margin: 0 0 8px; }
+  .card p:last-child { margin-bottom:0; }
+  code { background: var(--code-bg); padding: 1px 6px; border-radius: 5px; font-size: 0.9em; font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+  .path { color: var(--accent-hi); }
+  .grid { display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-left:36px; }
+  @media (max-width: 620px) { .grid { grid-template-columns: 1fr; } }
+  .proof { background: var(--mint-dim); border:1px solid var(--mint-line); border-radius:10px; padding:14px 18px; margin: 14px 0 14px 36px; font-size:13.5px; }
+  .proof b { color: var(--mint); }
+  table { width:100%; border-collapse:collapse; margin: 12px 0 12px 36px; font-size:13px; }
+  th, td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--border); }
+  th { color:var(--text-faint); font-weight:600; text-transform:uppercase; font-size:11px; letter-spacing:.03em; }
+  .toc { background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:16px 20px; margin-bottom: 8px; }
+  .toc a { color: var(--text); text-decoration:none; font-size:13.5px; display:block; padding:3px 0; }
+  .toc a:hover { color: var(--accent-hi); }
+  footer { margin: 56px 0 0 0; padding-top:20px; border-top:1px solid var(--border); font-size:12.5px; color:var(--text-faint); }
+  a { color: var(--accent-hi); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>QA Nexus AI — Reviewer Guide</h1>
+  <p class="sub">A feature-by-feature walkthrough for anyone seeing this project for the first time.</p>
+  <div class="meta">
+    <span class="chip accent">Spec → test cases → Playwright suite → ZIP</span>
+    <span class="chip mint">Two verifiable differentiators</span>
+    <span class="chip">~10 min read</span>
+  </div>
+
+  <div class="toc">
+    <a href="#flow">1. The one flow this app does</a>
+    <a href="#framework">2. Framework-aware generation</a>
+    <a href="#grounding">3. Selector grounding — two tiers</a>
+    <a href="#cli">4. blast-ground CLI + verify-suite</a>
+    <a href="#cases">5. Test case review &amp; bulk actions</a>
+    <a href="#export">6. Export &amp; automation output</a>
+    <a href="#try">7. Fastest path to see it work</a>
+  </div>
+
+  <h2 id="flow"><span class="n">1</span> The one flow this app does</h2>
+  <p class="lede">Everything else in this guide is a variation on this single pipeline — there is no separate test-plan module, no execution tracker, no coverage-gap dashboard. One flow, done well.</p>
+  <div class="card">
+    <h3>Spec in → test cases out → Playwright suite out</h3>
+    <p>Input a live URL, an uploaded PDF/DOCX/MD/HTML document, a Jira issue key, or pasted text. The app extracts requirements, generates reviewable/editable test cases, and — on request — writes a runnable Playwright TypeScript Page Object Model suite, exportable as a ZIP.</p>
+    <p>Two generation modes: <b>Fast</b> (one chunked, checkpointed pass — resumes across rate limits) and <b>Deep analysis</b> (requirement extraction → human review → coverage planning → generation → self-critique).</p>
+  </div>
+
+  <h2 id="framework"><span class="n">2</span> Framework-aware generation</h2>
+  <p class="lede">The first differentiator. Most AI test generators invent their own page objects; this one reads yours first.</p>
+  <div class="card">
+    <h3>Upload your existing Playwright repo (Step 2)</h3>
+    <p>Drop a <code>.zip</code> of your framework, or pick the folder directly — parsed <b>entirely client-side</b> via JSZip, so your source never leaves the browser. The app extracts page-object classes, method signatures, fixtures, and conventions (naming, locator strategy, quote style, <code>baseURL</code>).</p>
+    <p>Generated specs then call <i>your</i> page classes with <i>your</i> method names, instead of inventing a parallel set you'd have to reconcile by hand.</p>
+  </div>
+  <div class="proof"><b>See it for yourself:</b> generate the same test case with and without a framework loaded — the README's "Before and after" section shows the exact diff.</div>
+
+  <h2 id="grounding"><span class="n">3</span> Selector grounding — two honestly-labelled tiers</h2>
+  <p class="lede">The second differentiator, and the one most worth a reviewer's attention. Grounding means every locator the model writes is checked against a real DOM instead of guessed from prose.</p>
+  <table>
+    <tr><th>Tier</th><th>Sources</th><th>What it actually proves</th></tr>
+    <tr><td><b>best-effort (static)</b></td><td>URL fetch · Paste DOM · Codegen recording</td><td>Selector was derived from markup that really exists. Nothing checked it resolves to exactly one node.</td></tr>
+    <tr><td><b>✅ live-verified</b></td><td>Import <code>grounding.json</code></td><td>A real headless browser ran <code>locator.count()</code> on every candidate — only exact single-node matches kept. Routes were fetched and confirmed live.</td></tr>
+  </table>
+  <div class="card">
+    <h3>Where to look: Step 3 → Import verified</h3>
+    <p>Click <b>Try the sample</b> — no API key needed — to load a real, committed grounding run (64 elements, 6 collections, 1 dead route, 2 unresolved) against a live public site. Watch the badge flip from <i>best-effort</i> to <i>✅ live-verified</i>, and the automation panel's grounding meter change with it.</p>
+    <p>Adding a best-effort source on top of an import <b>demotes the context back to best-effort</b> — the guarantee has to hold for every selector, or the generator would wrongly skip its own route check.</p>
+  </div>
+
+  <h2 id="cli"><span class="n">4</span> blast-ground CLI + verify-suite</h2>
+  <p class="lede">A local Node tool (<code class="path">tools/blast-ground/</code>) that produces the live-verified files the app imports, plus a gate that runs the generated suite for real. Kept out of the web build — its own <code>package.json</code>, excluded from <code>tsc</code>/tests/lint/Vercel.</p>
+  <div class="grid">
+    <div class="card" style="margin-left:0">
+      <h3>Grounding</h3>
+      <p>Drives real headless Chromium against a live page. Reaches <code>localhost</code>, VPN-only staging and login-gated targets a hosted web app structurally cannot. A selector matching many nodes is <b>rejected</b>, never disambiguated with <code>.nth(i)</code> — positional locators fail intermittently, which is worse than failing loudly.</p>
+    </div>
+    <div class="card" style="margin-left:0">
+      <h3>verify-suite</h3>
+      <p>Installs, typechecks (<code>tsc --noEmit</code>), and <b>actually runs</b> the generated suite via Playwright's JSON reporter — real pass/fail, not a guess. See the README's before/after: a real generated spec failed a live run, the root cause was traced, fixed, and re-verified stable.</p>
+    </div>
+  </div>
+
+  <h2 id="cases"><span class="n">5</span> Test case review &amp; bulk actions</h2>
+  <p class="lede">Generated cases are never a black box — they're a fully editable, filterable list before anything gets automated.</p>
+  <div class="card">
+    <h3>Edit, filter, select</h3>
+    <p>Every case, step, priority and component is inline-editable. Filter by scenario type. Tick individual cases or <b>Select all</b> within the active filter (never silently reaching hidden cases), then:</p>
+    <p><b>Export selected</b> — Jira CSV, Zephyr, Xray, TestRail or JSON, scoped to just the ticked cases.<br>
+    <b>Automate selected</b> — generate a Playwright suite from only that subset; regenerating keeps the same scope until you choose "Use all".<br>
+    <b>Delete selected</b> — bulk remove, with the selection self-pruning if a case is deleted individually.</p>
+  </div>
+
+  <h2 id="export"><span class="n">6</span> Export &amp; automation output</h2>
+  <div class="card">
+    <h3>What the ZIP contains</h3>
+    <p>Page objects, spec files, <code>playwright.config.ts</code>, <code>tsconfig.json</code>, <code>.env.example</code>, <code>.gitignore</code>, an auth setup file, and a GitHub Actions workflow — a project you can <code>npm install &amp;&amp; npm test</code>, not a code snippet.</p>
+    <p>Contract violations (route mismatches, strict-mode cardinality issues, invented locators, fixed waits) are <b>reported in the UI</b>, never silently auto-fixed — hiding that the model went off-framework would defeat the point.</p>
+  </div>
+
+  <h2 id="try"><span class="n">7</span> Fastest path to see it work</h2>
+  <div class="proof">
+    <b>No API key needed (2 minutes):</b> open the live demo → Step 3 "Selector grounding" → <i>Import verified</i> → <i>Try the sample</i>. Watch the tier badge and grounding meter change live.
+    <br><br>
+    <b>With a free API key (5 more minutes):</b> paste a URL in Step 1, generate test cases (Fast mode), tick a few, click <i>Automate N</i>, then <i>Download ZIP</i>.
+  </div>
+
+  <footer>
+    QA Nexus AI — see the project <a href="../README.md">README</a> for the full problem statement, tech stack, and a real end-to-end run with actual pass/fail output.
+  </footer>
+
+</div>
+</body>
+</html>
