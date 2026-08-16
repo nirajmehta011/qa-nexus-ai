@@ -106,7 +106,7 @@ router.post('/api/check-url', async (req, res) => {
     for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
       await assertPublicHttpUrl(currentUrl)
       const response = await axios.get(currentUrl, {
-        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; BlastFW-RouteCheck/1.0)' },
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; QANexus-RouteCheck/1.0)' },
         timeout: 10000,
         maxRedirects: 0,
         validateStatus: () => true

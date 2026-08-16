@@ -20,6 +20,7 @@
     "dotenv": "^16.3.1",
     "express": "^4.22.2",
     "express-rate-limit": "^7.4.0",
+    "jsonrepair": "^3.15.0",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8",
     "jszip": "^3.10.1",
@@ -31,6 +32,9 @@
     "zustand": "^4.4.1"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.4",
     "@types/express": "^4.17.21",
     "@types/jszip": "^3.4.0",
     "@types/react": "^18.2.37",

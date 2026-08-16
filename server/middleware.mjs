@@ -2,12 +2,36 @@ import cors from 'cors'
 import express from 'express'
 import rateLimit from 'express-rate-limit'
 
-// In production (Vercel) the frontend and API share the same domain so
-// CORS is not strictly required, but we allow all origins to handle any
-// preview/branch deployment URL. In local dev we restrict to known ports.
-const allowedOrigins = process.env.VERCEL
-  ? true // allow all origins on Vercel (same-domain or preview URLs)
-  : ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173']
+// In production (Vercel) the frontend and API share the same domain so CORS is
+// not strictly required, but we allow all origins to handle any preview/branch
+// deployment URL.
+//
+// In local dev we accept any LOOPBACK origin regardless of port. Pinning the
+// port broke every developer whose 5173 was already taken — Vite silently moves
+// to 5174 and every request is then blocked with an opaque ERR_FAILED. Loopback
+// is not a meaningful trust boundary here: anything that can open a browser tab
+// on this machine can already reach the proxy directly.
+const LOOPBACK_ORIGIN = /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/
+
+/** Exported for tests: decides whether a given Origin header is permitted. */
+export function isOriginAllowed(origin, { vercel = Boolean(process.env.VERCEL), allowList = process.env.ALLOWED_ORIGINS } = {}) {
+  // Same-origin and non-browser callers (curl, server-to-server) send no Origin.
+  if (!origin) return true
+  if (vercel) return true
+  if (allowList) {
+    return allowList
+      .split(',')
+      .map(o => o.trim())
+      .filter(Boolean)
+      .includes(origin)
+  }
+  return LOOPBACK_ORIGIN.test(origin)
+}
+
+const corsOrigin = (origin, callback) =>
+  isOriginAllowed(origin)
+    ? callback(null, true)
+    : callback(new Error(`Origin ${origin} is not allowed. Set ALLOWED_ORIGINS to permit it.`))
 
 // Per-IP abuse protection. On Vercel each lambda instance keeps its own
 // counters, so limits are approximate there — acceptable until auth lands.
@@ -31,7 +55,7 @@ export const completeLimiter = process.env.DISABLE_RATE_LIMIT === '1'
 
 export function applyMiddleware(app) {
   app.set('trust proxy', 1)
-  app.use(cors({ origin: allowedOrigins, credentials: true }))
+  app.use(cors({ origin: corsOrigin, credentials: true }))
   app.use(express.json({ limit: '15mb' }))
   app.use(express.urlencoded({ limit: '15mb', extended: true }))
   // DISABLE_RATE_LIMIT=1 is for local eval runs only – never set it in production.
